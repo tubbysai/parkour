@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Rooftop Rush</title>
+<style>
+  :root{--panel:rgba(9,22,42,.72);--accent:#55e0ff;--danger:#ff5577;--good:#78ffae}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:none}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071326;color:white;font-family:system-ui,Segoe UI,Arial,sans-serif;overscroll-behavior:none}
+  #wrap{position:fixed;inset:0;overflow:hidden;background:#071326}
+  canvas{display:block;width:100%;height:100%;touch-action:none}
+  .hud{position:absolute;inset:0;pointer-events:none;font-weight:800;text-shadow:0 2px 8px #001}
+  .stats{position:absolute;top:calc(12px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));display:flex;gap:10px;flex-wrap:wrap;font-size:14px}
+  .pill,.uiBtn{border:1px solid rgba(255,255,255,.22);background:var(--panel);backdrop-filter:blur(8px);border-radius:999px;padding:9px 13px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .topBtns{position:absolute;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));display:flex;gap:8px;pointer-events:auto}
+  button{font:inherit;color:white;border:0;cursor:pointer;touch-action:none}
+  .uiBtn{min-width:44px;min-height:42px}.uiBtn:active,.touchBtn.active{transform:translateY(1px);filter:brightness(1.18)}
+  .touch{position:absolute;left:0;right:0;bottom:0;height:42%;pointer-events:none;display:none}
+  .touchBtn{position:absolute;bottom:calc(22px + env(safe-area-inset-bottom));width:min(29vw,170px);height:min(29vw,170px);border-radius:32px;background:rgba(14,35,67,.58);border:2px solid rgba(255,255,255,.32);box-shadow:0 12px 35px rgba(0,0,0,.28), inset 0 0 24px rgba(85,224,255,.12);pointer-events:auto;font-size:19px;font-weight:900;letter-spacing:.06em}
+  #slideBtn{left:calc(24px + env(safe-area-inset-left))}#jumpBtn{right:calc(24px + env(safe-area-inset-right));background:rgba(28,58,92,.66)}
+  .overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:auto;background:linear-gradient(rgba(3,9,20,.15),rgba(3,9,20,.42));text-align:center;padding:24px}
+  .card{max-width:520px;background:rgba(6,17,34,.82);border:1px solid rgba(255,255,255,.22);border-radius:26px;padding:28px;box-shadow:0 22px 70px rgba(0,0,0,.38);backdrop-filter:blur(10px)}
+  h1{margin:0 0 8px;font-size:clamp(34px,7vw,68px);line-height:.95} h2{font-size:clamp(30px,6vw,54px);margin:0 0 12px}.muted{opacity:.82}.big{margin-top:18px;background:linear-gradient(135deg,#35d8ff,#8cffb9);color:#062038;border-radius:18px;padding:15px 28px;font-size:20px;font-weight:950;box-shadow:0 10px 30px rgba(85,224,255,.22)}
+  .tutorial{position:absolute;top:22%;left:50%;transform:translateX(-50%);font-size:clamp(20px,4vw,40px);text-align:center;transition:opacity .6s;opacity:1}.tutorial small{display:block;font-size:.48em;margin-top:6px;opacity:.85}.fade{opacity:0!important}
+  #debug{position:absolute;left:10px;bottom:10px;width:250px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:10px;font:12px/1.45 ui-monospace,monospace;display:none;pointer-events:auto}.dbgrow{display:flex;justify-content:space-between}.dbgbtn{margin-top:7px;margin-right:4px;background:#17395d;border-radius:7px;padding:6px 8px;font-size:12px}
+  @media (pointer:coarse){.touch{display:block}.stats{font-size:12px}.pill{padding:7px 10px}}
+  @media (orientation:portrait){.touchBtn{width:min(36vw,160px);height:min(36vw,160px);bottom:28px}.tutorial{top:16%}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" aria-label="Rooftop Rush game canvas"></canvas>
+  <div class="hud">
+    <div class="stats"><div class="pill" id="dist">Distance 0m</div><div class="pill" id="time">Time 0.00</div><div class="pill" id="best">Best --</div></div>
+    <div class="topBtns"><button class="uiBtn" id="pauseTop">Pause</button><button class="uiBtn" id="restartTop">Restart</button></div>
+    <div class="tutorial" id="tutorial">Jump over gaps<small>Space / Up / Jump button</small></div>
+    <div class="touch"><button class="touchBtn" id="slideBtn">SLIDE</button><button class="touchBtn" id="jumpBtn">JUMP</button></div>
+    <div class="overlay" id="overlay"><div class="card"><h2 id="overTitle">Paused</h2><p class="muted" id="overText"></p><button class="big" id="overBtn">Resume</button></div></div>
+    <div id="debug"><b>Debug (`)</b><div id="dbgText"></div><button class="dbgbtn" id="boxToggle">Boxes: off</button><button class="dbgbtn" id="dbgRestart">Restart</button></div>
+  </div>
+</div>
+<script>
+'use strict';
+// Rooftop Rush: one-file movement prototype. All distances are world pixels.
+(() => {
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id); const hud={dist:$('dist'),time:$('time'),best:$('best'),tutorial:$('tutorial'),overlay:$('overlay'),title:$('overTitle'),text:$('overText'),btn:$('overBtn'),debug:$('debug'),dbg:$('dbgText'),box:$('boxToggle')};
+const CFG={run:360,accel:1800,gravity:2000,jump:-720,coyote:.10,buffer:.12,slide:.55,lowGrav:.52,fallY:980,playerW:42,playerH:82,slideH:42};
+let W=0,H=0,DPR=1,scale=1,groundY=650,last=0,paused=false,failed=false,finished=false,slow=0,debug=false,showBoxes=false,best=safeBest();
+const input={jump:false,jumpPressed:false,slide:false};
+const particles=[], sparks=[];
+const level={length:17050, checkpointX:7200, finishX:16600, platforms:[], solids:[], deco:[]};
+function safeBest(){try{const v=Number(localStorage.getItem('rrBest'));return isFinite(v)&&v>0?v:null}catch(e){return null}} function saveBest(v){try{localStorage.setItem('rrBest',String(v))}catch(e){}}
+function addPlat(x,y,w,h=420,type='roof'){level.platforms.push({x,y,w,h,type});}
+function addSolid(x,y,w,h,kind='slide'){level.solids.push({x,y,w,h,kind});}
+function buildLevel(){
+ addPlat(0,650,1380); addSolid(950,568,76,82,'ac');
+ addPlat(1510,650,760); addPlat(2410,650,760); addSolid(2720,590,130,60,'low');
+ addPlat(3320,650,900); addPlat(4480,610,900); addSolid(4950,528,150,82,'billboard');
+ addPlat(5600,570,900); addSolid(6040,510,135,60,'low');
+ addPlat(6680,610,640); addPlat(7440,610,540,420,'beam'); addPlat(8100,650,780); addSolid(8420,568,86,82,'ac');
+ addPlat(9160,650,960); addPlat(10440,620,880); addPlat(11640,650,680,420,'glass'); addSolid(11980,590,140,60,'low');
+ addPlat(12560,650,550); addPlat(13380,650,3720); addSolid(13680,590,120,60,'low');
+ level.deco.push({x:1750,y:545,t:'tower'},{x:3650,y:540,t:'antenna'},{x:4720,y:490,t:'billboard'},{x:5750,y:475,t:'tower'},{x:7600,y:540,t:'crane'},{x:10900,y:525,t:'antenna'},{x:12100,y:560,t:'glass'},{x:13770,y:520,t:'finish'});
+}
+buildLevel();
+const player={x:90,y:0,w:CFG.playerW,h:CFG.playerH,vx:0,vy:0,grounded:false,slideT:0,coyote:0,buffer:0,state:'run',landT:0,checkpoint:false,startX:90,time:0,dist0:90};
+const camera={x:0,y:0,shake:0};
+function resize(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);scale=Math.min(Math.max(H/760,.72),1.18);groundY=H/scale-105;} addEventListener('resize',resize,{passive:false}); resize();
+function platformAtStart(x){return level.platforms.find(p=>x>=p.x&&x<=p.x+p.w)||level.platforms[0];}
+function reset(toCheckpoint=false){const sx=toCheckpoint?level.checkpointX+80:90, p=platformAtStart(sx); Object.assign(player,{x:sx,y:p.y-CFG.playerH,w:CFG.playerW,h:CFG.playerH,vx:0,vy:0,grounded:true,slideT:0,coyote:0,buffer:0,state:'run',landT:0,time:0,dist0:sx}); failed=finished=paused=false; slow=0; particles.length=sparks.length=0; hideOverlay();}
+reset(false);
+// Input system: keyboard and touch share held states; jumpPressed is edge-triggered for buffering.
+function pressJump(v){if(v&&!input.jump) input.jumpPressed=true; input.jump=v;} function pressSlide(v){input.slide=v;}
+addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','Escape'].includes(e.code))e.preventDefault(); if(e.code==='Space'||e.code==='ArrowUp')pressJump(true); if(e.code==='ArrowDown')pressSlide(true); if(e.code==='KeyR')restart(); if(e.code==='KeyP'||e.code==='Escape')togglePause(); if(e.code==='Backquote'){debug=!debug;hud.debug.style.display=debug?'block':'none';}}, {passive:false});
+addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='ArrowUp')pressJump(false); if(e.code==='ArrowDown')pressSlide(false);},{passive:false});
+function bindHold(el,down,up){['pointerdown','touchstart'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();el.classList.add('active');down();},{passive:false})); ['pointerup','pointercancel','pointerleave','touchend','touchcancel'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();el.classList.remove('active');up();},{passive:false}));}
+bindHold($('jumpBtn'),()=>pressJump(true),()=>pressJump(false)); bindHold($('slideBtn'),()=>pressSlide(true),()=>pressSlide(false));
+$('pauseTop').onclick=()=>togglePause(); $('restartTop').onclick=()=>restart(); $('dbgRestart').onclick=()=>restart(); hud.box.onclick=()=>{showBoxes=!showBoxes;hud.box.textContent='Boxes: '+(showBoxes?'on':'off')}; hud.btn.onclick=()=> failed||finished ? restart() : togglePause(false); addEventListener('blur',()=>{if(!failed&&!finished)togglePause(true)}); document.addEventListener('gesturestart',e=>e.preventDefault());
+function restart(){reset(player.checkpoint);} function togglePause(force){if(failed||finished)return; paused=force!==undefined?force:!paused; paused?showOverlay('Paused','Gameplay time and movement are stopped.','Resume'):hideOverlay();}
+function showOverlay(t,txt,b){hud.title.textContent=t;hud.text.innerHTML=txt;hud.btn.textContent=b;hud.overlay.style.display='flex'} function hideOverlay(){hud.overlay.style.display='none'}
+function update(dt){if(paused)return; if(slow>0){slow-=dt;dt*=.28} if(failed||finished)return;
+ player.time+=dt; player.vx += (CFG.run-player.vx)*Math.min(1,CFG.accel*dt/CFG.run); player.x+=player.vx*dt;
+ player.buffer=Math.max(0,player.buffer-dt); if(input.jumpPressed){player.buffer=CFG.buffer; input.jumpPressed=false;}
+ if(player.grounded)player.coyote=CFG.coyote; else player.coyote=Math.max(0,player.coyote-dt);
+ const wantsSlide=input.slide&&player.grounded; if(wantsSlide&&player.slideT<=0)player.slideT=CFG.slide; if(player.slideT>0)player.slideT-=dt;
+ const targetH=player.slideT>0?CFG.slideH:CFG.playerH; if(targetH!==player.h){const oldBottom=player.y+player.h; player.h=targetH; player.y=oldBottom-player.h;}
+ if(player.buffer>0&&player.coyote>0&&player.slideT<=0){player.vy=CFG.jump; player.grounded=false; player.coyote=0; player.buffer=0; hud.tutorial.classList.add('fade'); setTimeout(()=>{if(hud.tutorial.textContent.includes('Jump')){hud.tutorial.innerHTML='Slide under obstacles<small>Down / Slide button</small>';hud.tutorial.classList.remove('fade')}},650)}
+ const gmul=(input.jump&&player.vy<0)?CFG.lowGrav:1; player.vy+=CFG.gravity*gmul*dt; const prev={x:player.x-player.vx*dt,y:player.y}; player.y+=player.vy*dt; collide(prev,dt);
+ if(player.slideT>0){hud.tutorial.classList.add('fade'); if(Math.random()<.35) sparks.push({x:player.x+player.w*.8,y:player.y+player.h-5,vx:-80-Math.random()*90,vy:-30-Math.random()*70,a:.35});}
+ player.checkpoint=player.checkpoint||player.x>level.checkpointX; if(player.y>groundY+CFG.fallY)fail(); if(player.x>=level.finishX)finish(); updateParticles(dt); updateCamera(dt); updateHud();}
+// Collision resolves vertical platforms first, then horizontal solid obstacles to avoid tunneling and wall-sticking.
+function collide(prev,dt){player.grounded=false; const pb=prev.y+player.h, nb=player.y+player.h;
+ for(const p of level.platforms){if(player.x+player.w>p.x+4&&player.x<p.x+p.w-4 && pb<=p.y+8 && nb>=p.y && player.vy>=0){player.y=p.y-player.h; if(player.vy>620){camera.shake=.08; dust(player.x+player.w/2,p.y,10)} else if(!player.grounded) dust(player.x+player.w/2,p.y,4); player.vy=0; player.grounded=true; player.landT=.12;}}
+ for(const s of level.solids){if(aabb(player,s)){if(prev.x+player.w<=s.x){player.x=s.x-player.w-.01; player.vx=Math.min(player.vx,0); fail(true)} else if(prev.x>=s.x+s.w){player.x=s.x+s.w+.01} else if(prev.y+player.h<=s.y){player.y=s.y-player.h; player.vy=0; player.grounded=true} else {player.y=s.y+s.h+.01; player.vy=Math.max(player.vy,60)}}}
+ if(player.landT>0)player.landT-=dt; player.state=player.slideT>0?'slide':(!player.grounded?(player.vy<0?'jump':'fall'):(player.landT>0?'land':'run'));}
+function aabb(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y} function fail(hit=false){failed=true;slow=.28;showOverlay('Run Failed',`Distance reached: ${Math.max(0,Math.floor((player.x-player.dist0)/10))}m${player.checkpoint?'<br>Checkpoint reached. Restarting there.':''}`,'Restart');}
+function finish(){finished=true;player.vx=0;let nb=false;if(!best||player.time<best){best=player.time;saveBest(best);nb=true} burst(level.finishX,590); showOverlay('Finished!',`Completion time: ${player.time.toFixed(2)}s<br>${nb?'<b style="color:var(--good)">New Best!</b>':'Best: '+best.toFixed(2)+'s'}`,'Run Again'); updateHud();}
+function dust(x,y,n){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*130,vy:-Math.random()*80,a:.45,r:2+Math.random()*4,c:'rgba(230,220,190,'});} function burst(x,y){for(let i=0;i<36;i++)particles.push({x,y,vx:(Math.random()-.5)*360,vy:(Math.random()-.7)*300,a:1,r:3+Math.random()*4,c:['rgba(85,224,255,','rgba(120,255,174,','rgba(255,215,95,'][i%3]});}
+function updateParticles(dt){for(const arr of [particles,sparks])for(let i=arr.length-1;i>=0;i--){const p=arr[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.a-=dt*(arr===sparks?2.5:1.7);if(p.a<=0)arr.splice(i,1)}}
+function updateCamera(dt){const target=Math.max(0,Math.min(level.length-W/scale,player.x-W/scale*.30+190)); camera.x+=(target-camera.x)*(1-Math.pow(.001,dt)); camera.y+=(0-camera.y)*(1-Math.pow(.004,dt)); camera.shake=Math.max(0,camera.shake-dt);}
+function updateHud(){hud.dist.textContent='Distance '+Math.max(0,Math.floor((player.x-player.dist0)/10))+'m'; hud.time.textContent='Time '+player.time.toFixed(2); hud.best.textContent='Best '+(best?best.toFixed(2):'--');}
+function render(){ctx.clearRect(0,0,W,H); ctx.save(); ctx.scale(scale,scale); const vw=W/scale,vh=H/scale,shake=camera.shake? (Math.random()-.5)*8:0; drawSky(vw,vh); ctx.translate(-camera.x+shake,0); drawWorld(vw,vh); drawPlayer(); if(showBoxes)drawBoxes(); ctx.restore(); if(debug)drawDebug();}
+function drawSky(vw,vh){const g=ctx.createLinearGradient(0,0,0,vh);g.addColorStop(0,'#79d8ff');g.addColorStop(.55,'#bfeaff');g.addColorStop(1,'#f8c59c');ctx.fillStyle=g;ctx.fillRect(0,0,vw,vh); skyline(.12, '#7aa6c9', 240, .55); skyline(.28,'#527fa8',300,.72); skyline(.48,'#2d547c',380,.9);} 
+function skyline(par,c,base,alpha){ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=c;const off=-(camera.x*par)%260;for(let x=off-260;x<W/scale+260;x+=130){const h=90+((x*17)%120+120)%120;ctx.fillRect(x,base-h,92,h);ctx.fillStyle='rgba(255,245,170,.28)';for(let yy=base-h+18;yy<base-12;yy+=26)for(let xx=x+14;xx<x+80;xx+=24)ctx.fillRect(xx,yy,8,12);ctx.fillStyle=c;}ctx.restore();}
+function drawWorld(vw,vh){for(const p of level.platforms)drawPlatform(p); for(const d of level.deco)drawDeco(d); for(const s of level.solids)drawSolid(s); ctx.fillStyle='#33f0a0';ctx.fillRect(level.checkpointX,420,8,230);ctx.fillStyle='#fff';ctx.font='20px system-ui';ctx.fillText('CHECKPOINT',level.checkpointX+18,450); ctx.fillStyle='#fff';ctx.fillRect(level.finishX,405,10,245);ctx.fillText('FINISH',level.finishX+22,435); drawParticles();}
+function drawPlatform(p){ctx.fillStyle=p.type==='beam'?'#5e7088':(p.type==='glass'?'rgba(100,220,255,.55)':'#233b59');ctx.fillRect(p.x,p.y,p.w,p.h);ctx.fillStyle=p.type==='beam'?'#a9bfd6':'#344f73';ctx.fillRect(p.x,p.y,p.w,18);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(p.x,p.y+18,p.w,12); if(p.type==='glass'){ctx.strokeStyle='rgba(255,255,255,.45)';for(let x=p.x+30;x<p.x+p.w;x+=70){ctx.beginPath();ctx.moveTo(x,p.y+5);ctx.lineTo(x+42,p.y+75);ctx.stroke();}}}
+function drawSolid(s){ctx.save();ctx.fillStyle=s.kind==='low'?'#b34c5f':'#d8e3ef';ctx.fillRect(s.x,s.y,s.w,s.h);ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(s.x+8,s.y+s.h-8,s.w-16,8); if(s.kind==='low'){ctx.fillStyle='#e8a0aa';ctx.fillRect(s.x+10,s.y+8,s.w-20,10)} else {ctx.fillStyle='#6b8298';ctx.fillRect(s.x+12,s.y+18,s.w-24,18)} ctx.restore();}
+function drawDeco(d){ctx.save(); if(d.t==='tower'){ctx.fillStyle='#7b4b35';ctx.fillRect(d.x,d.y,90,55);ctx.fillStyle='#4b2d22';ctx.fillRect(d.x+8,d.y-35,74,35);ctx.strokeStyle='#342';ctx.beginPath();ctx.moveTo(d.x+8,d.y+55);ctx.lineTo(d.x+18,d.y+90);ctx.moveTo(d.x+82,d.y+55);ctx.lineTo(d.x+72,d.y+90);ctx.stroke();} if(d.t==='antenna'){ctx.strokeStyle='#182d45';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(d.x,d.y+90);ctx.lineTo(d.x+28,d.y);ctx.lineTo(d.x+56,d.y+90);ctx.stroke();} if(d.t==='billboard'){ctx.fillStyle='#20324e';ctx.fillRect(d.x,d.y,260,105);ctx.fillStyle='#55e0ff';ctx.font='24px system-ui';ctx.fillText('ROOFTOP RUSH',d.x+22,d.y+58);} if(d.t==='crane'){ctx.fillStyle='#f5b841';ctx.fillRect(d.x,d.y,420,14);for(let i=0;i<420;i+=42){ctx.strokeStyle='#91651d';ctx.beginPath();ctx.moveTo(d.x+i,d.y);ctx.lineTo(d.x+i+42,d.y+14);ctx.stroke();}} ctx.restore();}
+function drawPlayer(){const x=player.x,y=player.y,w=player.w,h=player.h,t=performance.now()/1000,run=Math.sin(t*14); ctx.save();ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(x+w/2,y+h+8,26,7,0,0,7);ctx.fill();ctx.translate(x+w/2,y); if(player.state==='slide'){ctx.rotate(-.18);ctx.fillStyle='#ffcf55';ctx.fillRect(-24,12,54,18);ctx.fillStyle='#263a5a';ctx.fillRect(-12,28,58,11);ctx.fillStyle='#ffe0a3';ctx.beginPath();ctx.arc(-30,15,11,0,7);ctx.fill();} else {ctx.strokeStyle='#17263f';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-6,34);ctx.lineTo(-18,56+run*12);ctx.moveTo(8,35);ctx.lineTo(19,56-run*12);ctx.moveTo(-5,20);ctx.lineTo(-22,30-run*10);ctx.moveTo(7,20);ctx.lineTo(24,29+run*10);ctx.stroke();ctx.fillStyle='#ffcf55';ctx.fillRect(-15,18,30,30);ctx.fillStyle='#ffe0a3';ctx.beginPath();ctx.arc(0,8,14,0,7);ctx.fill();ctx.fillStyle='#263a5a';ctx.fillRect(-16,46,13,27);ctx.fillRect(4,46,13,27);} ctx.restore();}
+function drawParticles(){for(const p of particles){ctx.fillStyle=p.c+Math.max(0,p.a)+')';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill()} for(const p of sparks){ctx.strokeStyle='rgba(255,220,100,'+p.a+')';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*.04,p.y-p.vy*.04);ctx.stroke();}}
+function drawBoxes(){ctx.strokeStyle='lime';ctx.strokeRect(player.x,player.y,player.w,player.h);ctx.strokeStyle='red';for(const s of level.solids)ctx.strokeRect(s.x,s.y,s.w,s.h);ctx.strokeStyle='yellow';for(const p of level.platforms)ctx.strokeRect(p.x,p.y,p.w,4);}
+function drawDebug(){hud.dbg.innerHTML=`<div class=dbgrow><span>FPS</span><span>${fps.toFixed(0)}</span></div><div class=dbgrow><span>X,Y</span><span>${player.x.toFixed(1)}, ${player.y.toFixed(1)}</span></div><div class=dbgrow><span>VX,VY</span><span>${player.vx.toFixed(1)}, ${player.vy.toFixed(1)}</span></div><div class=dbgrow><span>Grounded</span><span>${player.grounded}</span></div><div class=dbgrow><span>Sliding</span><span>${player.slideT>0}</span></div><div class=dbgrow><span>Anim</span><span>${player.state}</span></div>`;}
+let fps=60,frames=0,acc=0; function loop(ts){let dt=Math.min((ts-last)/1000||0,1/30); last=ts; frames++;acc+=dt;if(acc>.5){fps=frames/acc;frames=0;acc=0} update(dt); render(); requestAnimationFrame(loop);} requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
