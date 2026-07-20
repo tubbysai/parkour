@@ -13,59 +13,784 @@
     .ui{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:22px;transition:.25s;pointer-events:none}
     .ui.hidden{opacity:0;visibility:hidden;transform:scale(1.02)}
     .panel{pointer-events:auto;width:min(92vw,460px);max-height:90vh;overflow:auto;padding:clamp(24px,6vw,38px);text-align:center;border:1px solid rgba(85,217,255,.24);border-radius:26px;background:linear-gradient(145deg,rgba(15,34,67,.9),var(--panel));box-shadow:0 28px 90px #000a,inset 0 1px #ffffff18;backdrop-filter:blur(14px)}
-    .nasa{display:inline-flex;align-items:center;gap:7px;margin-bottom:13px;color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.28em;text-transform:uppercase}.nasa:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red)}
-    h1{margin:0;font-size:clamp(39px,11vw,66px);font-weight:950;line-height:.87;letter-spacing:-.065em;text-transform:uppercase}h1 span{display:block;color:var(--blue);font-size:.66em;letter-spacing:.04em}
-    h2{margin:0;font-size:clamp(27px,7vw,38px);letter-spacing:-.04em}.sub{margin:16px 0 24px;color:var(--muted);line-height:1.5;font-size:14px}
-    button{width:100%;min-height:52px;border:0;border-radius:14px;color:#06101c;background:linear-gradient(110deg,#52d5ff,#c4f4ff);font:900 14px/1 Inter,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:0 9px 26px #23b8e62c;transition:.12s}button:active{transform:scale(.97)}button.secondary{margin-top:10px;color:var(--white);background:#ffffff0a;border:1px solid #ffffff1f;box-shadow:none}
-    .difficulty{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:18px 0}.difficulty button{min-height:62px;padding:8px 4px;background:#ffffff08;color:var(--muted);border:1px solid #ffffff14;font-size:10px;box-shadow:none}.difficulty button b{display:block;margin-bottom:5px;color:var(--white);font-size:12px}.difficulty button.active{background:#55d9ff17;border-color:var(--blue);color:var(--blue)}
-    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:15px;border-top:1px solid #ffffff12;color:#778ba9;font-size:10px;letter-spacing:.1em;text-transform:uppercase}.sound{width:auto;min-height:34px;padding:0 13px;font-size:9px;background:#ffffff0a;color:var(--white);box-shadow:none}
-    .how{text-align:left}.cards{display:grid;gap:9px;margin:20px 0}.card{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center;padding:11px;border-radius:13px;background:#ffffff08}.icon{width:40px;height:40px;display:grid;place-items:center;border-radius:11px;background:#55d9ff14;color:var(--blue);font-size:20px}.card b{display:block;font-size:13px}.card small{display:block;margin-top:3px;color:var(--muted);line-height:1.35}
-    #hud{position:fixed;z-index:4;inset:0;pointer-events:none;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right))}.hudrow{display:flex;justify-content:space-between;align-items:flex-start}.stats{display:flex;gap:24px}.stat label{display:block;color:#7e91af;font-size:8px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.stat b{font-size:21px;font-variant-numeric:tabular-nums}.hud-hidden{opacity:0;visibility:hidden}#pauseBtn{pointer-events:auto;width:46px;min-height:46px;border-radius:50%;padding:0;color:white;background:#08152bc4;border:1px solid #55d9ff4d;box-shadow:none}.mission{text-align:center;margin-top:5px;color:var(--blue);font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase}
-    #toast{position:fixed;z-index:4;top:23%;left:50%;width:min(86%,520px);transform:translate(-50%,-10px);text-align:center;opacity:0;transition:.35s;pointer-events:none}#toast.show{opacity:1;transform:translate(-50%,0)}#toast strong{display:block;font-size:clamp(17px,4.5vw,24px)}#toast small{color:var(--blue);font-weight:900;letter-spacing:.2em;text-transform:uppercase}
-    .results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:22px 0}.results div{padding:13px 5px;border-radius:12px;background:#ffffff08}.results b{display:block;font-size:24px}.results small{color:#7e91af;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
-    @media(max-height:650px){.panel{padding:20px}.sub{margin:9px 0 14px}.difficulty{margin:10px 0}.cards{margin:10px 0;grid-template-columns:1fr 1fr}.card{padding:7px}}
+    .nasa{display:inline-flex;align-items:center;gap:7px;margin-bottom:13px;color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.28em;text-transform:uppercase}
+    .nasa:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red)}
+    h1{margin:0;font-size:clamp(39px,11vw,66px);font-weight:950;line-height:.87;letter-spacing:-.065em;text-transform:uppercase}
+    h1 span{display:block;color:var(--blue);font-size:.66em;letter-spacing:.04em}
+    h2{margin:0;font-size:clamp(27px,7vw,38px);letter-spacing:-.04em}
+    .sub{margin:16px 0 24px;color:var(--muted);line-height:1.5;font-size:14px}
+    button{width:100%;min-height:52px;border:0;border-radius:14px;color:#06101c;background:linear-gradient(110deg,#52d5ff,#c4f4ff);font:900 14px/1 Inter,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:0 9px 26px #23b8e62c;transition:.12s}
+    button:active{transform:scale(.97)}
+    button.secondary{margin-top:10px;color:var(--white);background:#ffffff0a;border:1px solid #ffffff1f;box-shadow:none}
+    .difficulty{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:18px 0}
+    .difficulty button{min-height:62px;padding:8px 4px;background:#ffffff08;color:var(--muted);border:1px solid #ffffff14;font-size:10px;box-shadow:none}
+    .difficulty button b{display:block;margin-bottom:5px;color:var(--white);font-size:12px}
+    .difficulty button.active{background:#55d9ff17;border-color:var(--blue);color:var(--blue)}
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:15px;border-top:1px solid #ffffff12;color:#778ba9;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+    .sound{width:auto;min-height:34px;padding:0 13px;font-size:9px;background:#ffffff0a;color:var(--white);box-shadow:none}
+    .how{text-align:left}
+    .cards{display:grid;gap:9px;margin:20px 0}
+    .card{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center;padding:11px;border-radius:13px;background:#ffffff08}
+    .icon{width:40px;height:40px;display:grid;place-items:center;border-radius:11px;background:#55d9ff14;color:var(--blue);font-size:20px}
+    .card b{display:block;font-size:13px}
+    .card small{display:block;margin-top:3px;color:var(--muted);line-height:1.35}
+    #hud{position:fixed;z-index:4;inset:0;pointer-events:none;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right))}
+    .hudrow{display:flex;justify-content:space-between;align-items:flex-start}
+    .stats{display:flex;gap:24px}
+    .stat label{display:block;color:#7e91af;font-size:8px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+    .stat b{font-size:21px;font-variant-numeric:tabular-nums}
+    .hud-hidden{opacity:0;visibility:hidden}
+    #pauseBtn{pointer-events:auto;width:46px;min-height:46px;border-radius:50%;padding:0;color:white;background:#08152bc4;border:1px solid #55d9ff4d;box-shadow:none}
+    .mission{text-align:center;margin-top:5px;color:var(--blue);font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase}
+    #toast{position:fixed;z-index:4;top:23%;left:50%;width:min(86%,520px);transform:translate(-50%,-10px);text-align:center;opacity:0;transition:.35s;pointer-events:none}
+    #toast.show{opacity:1;transform:translate(-50%,0)}
+    #toast strong{display:block;font-size:clamp(17px,4.5vw,24px)}
+    #toast small{color:var(--blue);font-weight:900;letter-spacing:.2em;text-transform:uppercase}
+    .results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:22px 0}
+    .results div{padding:13px 5px;border-radius:12px;background:#ffffff08}
+    .results b{display:block;font-size:24px}
+    .results small{color:#7e91af;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    @media(max-height:650px){
+      .panel{padding:20px}
+      .sub{margin:9px 0 14px}
+      .difficulty{margin:10px 0}
+      .cards{margin:10px 0;grid-template-columns:1fr 1fr}
+      .card{padding:7px}
+    }
   </style>
 </head>
 <body>
 <canvas id="game" aria-label="Jetpack Deep Space game"></canvas>
-<div id="hud" class="hud-hidden"><div class="hudrow"><div class="stats"><div class="stat"><label>Telemetry</label><b id="score">000</b></div><div class="stat"><label>Best</label><b id="bestHud">000</b></div><div class="stat"><label>Samples</label><b id="samples">0</b></div></div><button id="pauseBtn" aria-label="Pause">Ⅱ</button></div><div class="mission" id="mission">Low Earth Orbit</div></div>
-<div id="toast"><strong id="toastLine"></strong><small id="toastRef"></small></div>
-<section id="menu" class="ui"><div class="panel"><div class="nasa">Deep Space Flight Lab</div><h1>Jetpack <span>Deep Space</span></h1><p class="sub">Pilot an astronaut through NASA's most daring science mission.</p><div class="difficulty" id="difficulty"></div><button id="start">Launch mission</button><button id="howBtn" class="secondary">Flight briefing</button><div class="footer"><span id="total">0 missions · 0 samples</span><button class="sound">Sound on</button></div></div></section>
-<section id="how" class="ui hidden"><div class="panel how"><div class="nasa">Mission briefing</div><h2>How to fly</h2><div class="cards"><div class="card"><span class="icon">🔥</span><div><b>Fire the jetpack</b><small>Tap, click, or press Space to thrust upward.</small></div></div><div class="card"><span class="icon">▥</span><div><b>Clear the modules</b><small>Pass through each station gap for +1 telemetry.</small></div></div><div class="card"><span class="icon">⬡</span><div><b>Gather samples</b><small>Collect glowing research canisters for +2 and a streak.</small></div></div><div class="card"><span class="icon">✦</span><div><b>Explore farther</b><small>Unlock NASA milestones as the mission crosses new regions.</small></div></div></div><p class="sub">Gravity never switches off. Speed increases and flight corridors tighten as you travel deeper into space.</p><button id="howBack">Ready for launch</button></div></section>
-<section id="pause" class="ui hidden"><div class="panel"><div class="nasa">Mission holding</div><h2>Flight paused</h2><p class="sub">Thrusters are stable. Telemetry link remains active.</p><button id="resume">Resume countdown</button><button id="restartPause" class="secondary">Restart mission</button><button id="menuPause" class="secondary">Return to base</button></div></section>
-<section id="over" class="ui hidden"><div class="panel"><div class="nasa">Mission report</div><h2>Signal lost</h2><p class="sub" id="report">Every test flight advances the program.</p><div class="results"><div><b id="final">0</b><small>Telemetry</small></div><div><b id="best">0</b><small>Best</small></div><div><b id="found">0</b><small>Samples</small></div></div><button id="again">Relaunch</button><button id="menuOver" class="secondary">Return to base</button></div></section>
+
+<div id="hud" class="hud-hidden">
+  <div class="hudrow">
+    <div class="stats">
+      <div class="stat"><label>Best</label><b id="bestHud">000</b></div>
+      <div class="stat"><label>Samples</label><b id="samples">0</b></div>
+      <div class="stat"><label>Telemetry</label><b id="score">000</b></div>
+      <div class="stat"><label>Lives</label><b id="lives">♥♥♥</b></div>
+    </div>
+    <button id="pauseBtn" aria-label="Pause">Ⅱ</button>
+  </div>
+  <div class="mission" id="mission">Low Earth Orbit</div>
+</div>
+
+<div id="toast">
+  <strong id="toastLine"></strong>
+  <small id="toastRef"></small>
+</div>
+
+<section id="menu" class="ui">
+  <div class="panel">
+    <div class="nasa">Deep Space Flight Lab</div>
+    <h1>Jetpack <span>Deep Space</span></h1>
+    <p class="sub">Pilot an astronaut through NASA's most daring science mission.</p>
+    <div class="difficulty" id="difficulty"></div>
+    <button id="start">Launch mission</button>
+    <button id="howBtn" class="secondary">Flight briefing</button>
+    <div class="footer">
+      <span id="total">0 missions · 0 samples</span>
+      <button class="sound">Sound on</button>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="ui hidden">
+  <div class="panel how">
+    <div class="nasa">Mission briefing</div>
+    <h2>How to fly</h2>
+    <div class="cards">
+      <div class="card">
+        <span class="icon">🔥</span>
+        <div><b>Fire the jetpack</b><small>Tap, click, or press Space to thrust upward.</small></div>
+      </div>
+      <div class="card">
+        <span class="icon">▥</span>
+        <div><b>Clear the modules</b><small>Pass through each station gap for +1 telemetry.</small></div>
+      </div>
+      <div class="card">
+        <span class="icon">⬡</span>
+        <div><b>Gather samples</b><small>Collect glowing research canisters for +2 and a streak.</small></div>
+      </div>
+      <div class="card">
+        <span class="icon">♥</span>
+        <div><b>Three suit reserves</b><small>You have three lives per mission. A collision uses one reserve before the mission ends.</small></div>
+      </div>
+      <div class="card">
+        <span class="icon">✦</span>
+        <div><b>Explore farther</b><small>Unlock NASA milestones as the mission crosses new regions.</small></div>
+      </div>
+    </div>
+    <p class="sub">Gravity never switches off. Speed increases and flight corridors tighten as you travel deeper into space.</p>
+    <button id="howBack">Ready for launch</button>
+  </div>
+</section>
+
+<section id="pause" class="ui hidden">
+  <div class="panel">
+    <div class="nasa">Mission holding</div>
+    <h2>Flight paused</h2>
+    <p class="sub">Thrusters are stable. Telemetry link remains active.</p>
+    <button id="resume">Resume countdown</button>
+    <button id="restartPause" class="secondary">Restart mission</button>
+    <button id="menuPause" class="secondary">Return to base</button>
+  </div>
+</section>
+
+<section id="over" class="ui hidden">
+  <div class="panel">
+    <div class="nasa">Mission report</div>
+    <h2>Signal lost</h2>
+    <p class="sub" id="report">Every test flight advances the program.</p>
+    <div class="results">
+      <div><b id="final">0</b><small>Telemetry</small></div>
+      <div><b id="best">0</b><small>Best</small></div>
+      <div><b id="found">0</b><small>Samples</small></div>
+    </div>
+    <button id="again">Relaunch</button>
+    <button id="menuOver" class="secondary">Return to base</button>
+  </div>
+</section>
+
 <script>
-(()=>{'use strict';
-const cv=document.getElementById('game'),ctx=cv.getContext('2d'),$=id=>document.getElementById(id),TAU=Math.PI*2;
-let W,H,dpr,last=performance.now(),state='menu',soundOn=true,diff=localStorage.getItem('jetpackDiff')||'normal',toastTimer;
-const cfg={easy:{name:'Cadet',sub:'Wide corridor',speed:145,gravity:690,gap:.38},normal:{name:'Explorer',sub:'Flight standard',speed:185,gravity:800,gap:.31},hard:{name:'Commander',sub:'Expert systems',speed:225,gravity:880,gap:.26}};
-const milestones=[[5,'Orbital insertion confirmed','LOW EARTH ORBIT'],[12,'Lunar trajectory acquired','ARTEMIS CORRIDOR'],[20,'Mars relay is online','DEEP SPACE NETWORK'],[30,'Asteroid sample secured','OSIRIS-REX LAB'],[45,'Voyager boundary crossed','INTERSTELLAR SPACE'],[60,'New worlds await discovery','EXOPLANET SURVEY']];
-const regions=['Low Earth Orbit','Lunar Transfer','Mars Approach','Outer Planets'];
-let player,stations,samples,particles,stars,score,best,found,streak,speed,elapsed,region,milestone;
-function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
-function store(k,v){try{localStorage.setItem('jetpack_'+k,v)}catch(e){}}function load(k,d=0){try{return Number(localStorage.getItem('jetpack_'+k))||d}catch(e){return d}}
-function buildDiff(){const box=$('difficulty');box.innerHTML='';Object.entries(cfg).forEach(([k,v])=>{const b=document.createElement('button');b.className=k===diff?'active':'';b.innerHTML=`<b>${v.name}</b>${v.sub}`;b.onclick=()=>{diff=k;localStorage.setItem('jetpackDiff',k);buildDiff()};box.appendChild(b)})}
-function totals(){$('total').textContent=`${load('plays')} missions · ${load('samples')} samples`;document.querySelectorAll('.sound').forEach(x=>x.textContent='Sound '+(soundOn?'on':'off'))}
-function screens(id){['menu','how','pause','over'].forEach(x=>$(x).classList.toggle('hidden',x!==id));$('hud').classList.toggle('hud-hidden',id!==null)}
-function tone(f,d=.1,type='sine',vol=.05){if(!soundOn)return;try{audio.ctx??=new(window.AudioContext||window.webkitAudioContext)();audio.ctx.resume();const o=audio.ctx.createOscillator(),g=audio.ctx.createGain(),t=audio.ctx.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(audio.ctx.destination);o.start();o.stop(t+d)}catch(e){}}
-const audio={ctx:null,thrust:()=>tone(240,.08,'sawtooth',.025),point:()=>tone(650,.09),sample:()=>{tone(820,.18);setTimeout(()=>tone(1180,.12),50)},hit:()=>tone(90,.4,'sawtooth',.1)};
-function reset(){const c=cfg[diff];score=found=streak=elapsed=region=milestone=0;speed=c.speed;best=load('best_'+diff);player={x:W*.28,y:H*.44,vy:0,r:17,flame:0};stations=[];samples=[];particles=[];stars=Array.from({length:100},()=>({x:Math.random()*W,y:Math.random()*H,s:.4+Math.random()*1.7,a:.25+Math.random()*.7}));spawn(W+130);hud()}
-function spawn(x){const c=cfg[diff],gap=Math.max(H*(c.gap-score*.0017),H*(c.gap-.075)),cy=H*.18+Math.random()*H*.58;stations.push({x,w:70,cy,gap,passed:false});if(Math.random()<.62)samples.push({x:x+35,y:cy+(Math.random()-.5)*gap*.46,a:Math.random()*TAU,got:false})}
-function hud(){$('score').textContent=String(score).padStart(3,'0');$('bestHud').textContent=String(Math.max(best,score)).padStart(3,'0');$('samples').textContent=found;$('mission').textContent=regions[region]}
-function start(){reset();state='playing';screens(null);tone(180,.3,'sawtooth',.05)}
-function thrust(){if(state!=='playing')return;player.vy=-Math.min(390,H*.59);player.flame=1;audio.thrust()}
-function notify(line,ref){$('toastLine').textContent=line;$('toastRef').textContent=ref;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2500)}
-function burst(x,y,color,n=18){for(let i=0;i<n;i++){const a=Math.random()*TAU,s=40+Math.random()*160;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.55,color})}}
-function gameOver(){if(state!=='playing')return;state='overing';audio.hit();burst(player.x,player.y,'#ff7b55',38);best=Math.max(best,score);store('best_'+diff,best);store('plays',load('plays')+1);store('samples',load('samples')+found);$('final').textContent=score;$('best').textContent=best;$('found').textContent=found;$('report').textContent=['Flight data received. The next launch is already being prepared.','Mission control logged every second of the test.','Science moves forward one bold flight at a time.'][Math.random()*3|0];setTimeout(()=>{state='over';screens('over')},550)}
-function update(dt){for(const s of stars){s.x-=speed*dt*s.s*.13;if(s.x<0){s.x=W;s.y=Math.random()*H}}particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.98;p.vy*=.98;p.life-=dt});particles=particles.filter(p=>p.life>0);if(state!=='playing')return;const c=cfg[diff];elapsed+=dt;speed=Math.min(c.speed+score*3.4,c.speed*2);player.vy+=c.gravity*dt;player.vy=Math.min(player.vy,560);player.y+=player.vy*dt;player.flame=Math.max(0,player.flame-dt*5);const last=stations.at(-1);if(last&&last.x<W-Math.max(235,W*.43))spawn(W+85);for(const p of stations){p.x-=speed*dt;if(!p.passed&&p.x+p.w<player.x){p.passed=true;score++;audio.point();const nr=Math.min(3,Math.floor(score/15));if(nr!==region){region=nr;notify('New mission phase unlocked',regions[region])}const m=milestones[milestone];if(m&&score>=m[0]){notify(m[1],m[2]);milestone++}hud()}if(player.x+12>p.x&&player.x-12<p.x+p.w&&(player.y-14<p.cy-p.gap/2||player.y+14>p.cy+p.gap/2))gameOver()}stations=stations.filter(p=>p.x>-100);for(const s of samples){s.x-=speed*dt;s.a+=dt*2.7;if(!s.got&&Math.hypot(s.x-player.x,s.y-player.y)<28){s.got=true;found++;streak++;score+=2;audio.sample();burst(s.x,s.y,'#55d9ff',18);notify(streak>1?`Research streak ×${streak}`:'Science sample secured','PAYLOAD CONFIRMED');hud()}else if(!s.got&&s.x<player.x-35)streak=0}samples=samples.filter(s=>s.x>-40&&!s.got);if(player.y>H+25||player.y<-45)gameOver()}
-function drawStation(p){const top=p.cy-p.gap/2,bot=p.cy+p.gap/2,g=ctx.createLinearGradient(p.x,0,p.x+p.w,0);g.addColorStop(0,'#192743');g.addColorStop(.5,'#577291');g.addColorStop(1,'#132039');ctx.fillStyle=g;ctx.fillRect(p.x,0,p.w,top);ctx.fillRect(p.x,bot,p.w,H-bot);ctx.fillStyle='#55d9ff';ctx.fillRect(p.x-5,top-9,p.w+10,9);ctx.fillRect(p.x-5,bot,p.w+10,9);ctx.strokeStyle='#a7bad055';for(let y=18;y<top-12;y+=30){ctx.strokeRect(p.x+10,y,p.w-20,12)}for(let y=bot+18;y<H;y+=30){ctx.strokeRect(p.x+10,y,p.w-20,12)}}
-function drawSample(s){ctx.save();ctx.translate(s.x,s.y+Math.sin(s.a)*4);ctx.rotate(s.a*.25);ctx.shadowBlur=18;ctx.shadowColor='#55d9ff';ctx.fillStyle='#dffaff';ctx.fillRect(-8,-11,16,22);ctx.fillStyle='#55d9ff';ctx.fillRect(-11,-5,22,10);ctx.restore()}
-function drawAstronaut(){const tilt=Math.max(-.45,Math.min(.6,player.vy/700));ctx.save();ctx.translate(player.x,player.y);ctx.rotate(tilt);if(player.flame||state==='playing'){ctx.globalAlpha=.65+Math.random()*.35;const gr=ctx.createLinearGradient(-33,0,-10,0);gr.addColorStop(0,'#ff4c39');gr.addColorStop(.5,'#ffbf4c');gr.addColorStop(1,'#dffcff');ctx.fillStyle=gr;ctx.beginPath();ctx.moveTo(-12,-8);ctx.lineTo(-27-Math.random()*12,0);ctx.lineTo(-12,8);ctx.fill();ctx.globalAlpha=1}ctx.fillStyle='#7389a8';ctx.fillRect(-14,-13,12,26);ctx.fillStyle='#f4f7fc';ctx.beginPath();ctx.roundRect(-7,-13,24,26,8);ctx.fill();ctx.fillStyle='#152744';ctx.beginPath();ctx.arc(11,-8,9,0,TAU);ctx.fill();ctx.fillStyle='#55d9ff';ctx.globalAlpha=.6;ctx.beginPath();ctx.arc(13,-9,5,0,TAU);ctx.fill();ctx.globalAlpha=1;ctx.strokeStyle='#f4f7fc';ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(1,7);ctx.lineTo(-4,18);ctx.moveTo(10,8);ctx.lineTo(16,18);ctx.moveTo(1,-3);ctx.lineTo(-10,3);ctx.stroke();ctx.restore()}
-function draw(){const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#020512');bg.addColorStop(.6,'#0a1530');bg.addColorStop(1,'#190d28');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);for(const s of stars){ctx.globalAlpha=s.a;ctx.fillStyle='#fff';ctx.fillRect(s.x,s.y,s.s,s.s)}ctx.globalAlpha=1;const planet=ctx.createRadialGradient(W*.82,H*.76,8,W*.82,H*.76,H*.3);planet.addColorStop(0,'#ef794c');planet.addColorStop(.5,'#7d2e4f');planet.addColorStop(1,'transparent');ctx.globalAlpha=.22;ctx.fillStyle=planet;ctx.beginPath();ctx.arc(W*.82,H*.76,H*.3,0,TAU);ctx.fill();ctx.globalAlpha=1;stations.forEach(drawStation);samples.forEach(drawSample);if(state!=='menu')drawAstronaut();for(const p of particles){ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3)}ctx.globalAlpha=1}
-function loop(now){const dt=Math.min(.033,(now-last)/1000||0);last=now;update(dt);draw();requestAnimationFrame(loop)}
-addEventListener('pointerdown',e=>{if(!e.target.closest('button')&&!e.target.closest('.panel'))thrust()});addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();thrust()}if(e.code==='Escape'){if(state==='playing'){state='paused';screens('pause')}else if(state==='paused'){state='playing';screens(null)}}});
-$('start').onclick=$('again').onclick=$('restartPause').onclick=start;$('howBtn').onclick=()=>screens('how');$('howBack').onclick=()=>screens('menu');$('pauseBtn').onclick=()=>{state='paused';screens('pause')};$('resume').onclick=()=>{state='playing';last=performance.now();screens(null)};$('menuPause').onclick=$('menuOver').onclick=()=>{state='menu';totals();screens('menu')};document.querySelectorAll('.sound').forEach(b=>b.onclick=()=>{soundOn=!soundOn;totals()});
-buildDiff();totals();reset();requestAnimationFrame(loop);
+(()=>{
+'use strict';
+
+const cv=document.getElementById('game');
+const ctx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2;
+
+let W,H,dpr;
+let last=performance.now();
+let state='menu';
+let soundOn=true;
+let diff=localStorage.getItem('jetpackDiff')||'normal';
+let toastTimer;
+
+const cfg={
+  easy:{name:'Cadet',sub:'Wide corridor',speed:145,gravity:690,gap:.38},
+  normal:{name:'Explorer',sub:'Flight standard',speed:185,gravity:800,gap:.31},
+  hard:{name:'Commander',sub:'Expert systems',speed:225,gravity:880,gap:.26}
+};
+
+const milestones=[
+  [5,'Orbital insertion confirmed','LOW EARTH ORBIT'],
+  [12,'Lunar trajectory acquired','ARTEMIS CORRIDOR'],
+  [20,'Mars relay is online','DEEP SPACE NETWORK'],
+  [30,'Asteroid sample secured','OSIRIS-REX LAB'],
+  [45,'Voyager boundary crossed','INTERSTELLAR SPACE'],
+  [60,'New worlds await discovery','EXOPLANET SURVEY']
+];
+
+const regions=[
+  'Low Earth Orbit',
+  'Lunar Transfer',
+  'Mars Approach',
+  'Outer Planets'
+];
+
+let player;
+let stations;
+let samples;
+let particles;
+let stars;
+let score;
+let best;
+let found;
+let streak;
+let speed;
+let elapsed;
+let region;
+let milestone;
+let lives;
+let invulnerable;
+
+function resize(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  W=innerWidth;
+  H=innerHeight;
+  cv.width=W*dpr;
+  cv.height=H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+addEventListener('resize',resize);
+resize();
+
+function store(k,v){
+  try{localStorage.setItem('jetpack_'+k,v)}catch(e){}
+}
+
+function load(k,d=0){
+  try{return Number(localStorage.getItem('jetpack_'+k))||d}catch(e){return d}
+}
+
+function buildDiff(){
+  const box=$('difficulty');
+  box.innerHTML='';
+
+  Object.entries(cfg).forEach(([k,v])=>{
+    const b=document.createElement('button');
+    b.className=k===diff?'active':'';
+    b.innerHTML=`<b>${v.name}</b>${v.sub}`;
+    b.onclick=()=>{
+      diff=k;
+      localStorage.setItem('jetpackDiff',k);
+      buildDiff();
+    };
+    box.appendChild(b);
+  });
+}
+
+function totals(){
+  $('total').textContent=`${load('plays')} missions · ${load('samples')} samples`;
+  document.querySelectorAll('.sound').forEach(x=>{
+    x.textContent='Sound '+(soundOn?'on':'off');
+  });
+}
+
+function screens(id){
+  ['menu','how','pause','over'].forEach(x=>{
+    $(x).classList.toggle('hidden',x!==id);
+  });
+  $('hud').classList.toggle('hud-hidden',id!==null);
+}
+
+function tone(f,d=.1,type='sine',vol=.05){
+  if(!soundOn)return;
+
+  try{
+    audio.ctx??=new(window.AudioContext||window.webkitAudioContext)();
+    audio.ctx.resume();
+
+    const o=audio.ctx.createOscillator();
+    const g=audio.ctx.createGain();
+    const t=audio.ctx.currentTime;
+
+    o.type=type;
+    o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(vol,t);
+    g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g).connect(audio.ctx.destination);
+    o.start();
+    o.stop(t+d);
+  }catch(e){}
+}
+
+const audio={
+  ctx:null,
+  thrust:()=>tone(240,.08,'sawtooth',.025),
+  point:()=>tone(650,.09),
+  sample:()=>{
+    tone(820,.18);
+    setTimeout(()=>tone(1180,.12),50);
+  },
+  hit:()=>tone(90,.4,'sawtooth',.1)
+};
+
+function reset(){
+  const c=cfg[diff];
+
+  score=0;
+  found=0;
+  streak=0;
+  elapsed=0;
+  region=0;
+  milestone=0;
+  lives=3;
+  invulnerable=0;
+  speed=c.speed;
+  best=load('best_'+diff);
+
+  player={
+    x:W*.28,
+    y:H*.44,
+    vy:0,
+    r:17,
+    flame:0
+  };
+
+  stations=[];
+  samples=[];
+  particles=[];
+
+  stars=Array.from({length:100},()=>({
+    x:Math.random()*W,
+    y:Math.random()*H,
+    s:.4+Math.random()*1.7,
+    a:.25+Math.random()*.7
+  }));
+
+  spawn(W+130);
+  hud();
+}
+
+function spawn(x){
+  const c=cfg[diff];
+  const gap=Math.max(
+    H*(c.gap-score*.0017),
+    H*(c.gap-.075)
+  );
+  const cy=H*.18+Math.random()*H*.58;
+
+  stations.push({
+    x,
+    w:70,
+    cy,
+    gap,
+    passed:false
+  });
+
+  if(Math.random()<.62){
+    samples.push({
+      x:x+35,
+      y:cy+(Math.random()-.5)*gap*.46,
+      a:Math.random()*TAU,
+      got:false
+    });
+  }
+}
+
+function hud(){
+  $('score').textContent=String(score).padStart(3,'0');
+  $('bestHud').textContent=String(Math.max(best,score)).padStart(3,'0');
+  $('samples').textContent=found;
+  $('lives').textContent='♥'.repeat(lives)+'♡'.repeat(3-lives);
+  $('mission').textContent=regions[region];
+}
+
+function start(){
+  reset();
+  state='playing';
+  screens(null);
+  tone(180,.3,'sawtooth',.05);
+}
+
+function thrust(){
+  if(state!=='playing')return;
+
+  player.vy=-Math.min(390,H*.59);
+  player.flame=1;
+  audio.thrust();
+}
+
+function notify(line,ref){
+  $('toastLine').textContent=line;
+  $('toastRef').textContent=ref;
+  $('toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{
+    $('toast').classList.remove('show');
+  },2500);
+}
+
+function burst(x,y,color,n=18){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*TAU;
+    const s=40+Math.random()*160;
+
+    particles.push({
+      x,
+      y,
+      vx:Math.cos(a)*s,
+      vy:Math.sin(a)*s,
+      life:.35+Math.random()*.55,
+      color
+    });
+  }
+}
+
+function loseLife(){
+  if(state!=='playing'||invulnerable>0)return;
+
+  lives--;
+  hud();
+
+  if(lives<=0){
+    gameOver();
+    return;
+  }
+
+  audio.hit();
+  burst(player.x,player.y,'#ff7b55',26);
+
+  player.y=H*.44;
+  player.vy=0;
+  invulnerable=1.7;
+  streak=0;
+
+  notify(
+    'Suit reserve activated',
+    lives+' '+(lives===1?'LIFE':'LIVES')+' REMAINING'
+  );
+}
+
+function gameOver(){
+  if(state!=='playing')return;
+
+  state='overing';
+  audio.hit();
+  burst(player.x,player.y,'#ff7b55',38);
+
+  best=Math.max(best,score);
+
+  store('best_'+diff,best);
+  store('plays',load('plays')+1);
+  store('samples',load('samples')+found);
+
+  $('final').textContent=score;
+  $('best').textContent=best;
+  $('found').textContent=found;
+
+  $('report').textContent=[
+    'Flight data received. The next launch is already being prepared.',
+    'Mission control logged every second of the test.',
+    'Science moves forward one bold flight at a time.'
+  ][Math.random()*3|0];
+
+  setTimeout(()=>{
+    state='over';
+    screens('over');
+  },550);
+}
+
+function update(dt){
+  for(const s of stars){
+    s.x-=speed*dt*s.s*.13;
+
+    if(s.x<0){
+      s.x=W;
+      s.y=Math.random()*H;
+    }
+  }
+
+  particles.forEach(p=>{
+    p.x+=p.vx*dt;
+    p.y+=p.vy*dt;
+    p.vx*=.98;
+    p.vy*=.98;
+    p.life-=dt;
+  });
+
+  particles=particles.filter(p=>p.life>0);
+
+  if(state!=='playing')return;
+
+  invulnerable=Math.max(0,invulnerable-dt);
+
+  const c=cfg[diff];
+
+  elapsed+=dt;
+  speed=Math.min(c.speed+score*3.4,c.speed*2);
+
+  player.vy+=c.gravity*dt;
+  player.vy=Math.min(player.vy,560);
+  player.y+=player.vy*dt;
+  player.flame=Math.max(0,player.flame-dt*5);
+
+  const lastStation=stations.at(-1);
+
+  if(lastStation&&lastStation.x<W-Math.max(235,W*.43)){
+    spawn(W+85);
+  }
+
+  for(const p of stations){
+    p.x-=speed*dt;
+
+    if(!p.passed&&p.x+p.w<player.x){
+      p.passed=true;
+      score++;
+      audio.point();
+
+      const newRegion=Math.min(3,Math.floor(score/15));
+
+      if(newRegion!==region){
+        region=newRegion;
+        notify('New mission phase unlocked',regions[region]);
+      }
+
+      const m=milestones[milestone];
+
+      if(m&&score>=m[0]){
+        notify(m[1],m[2]);
+        milestone++;
+      }
+
+      hud();
+    }
+
+    const touchingStation=
+      player.x+12>p.x&&
+      player.x-12<p.x+p.w&&
+      (
+        player.y-14<p.cy-p.gap/2||
+        player.y+14>p.cy+p.gap/2
+      );
+
+    if(touchingStation){
+      loseLife();
+    }
+  }
+
+  stations=stations.filter(p=>p.x>-100);
+
+  for(const s of samples){
+    s.x-=speed*dt;
+    s.a+=dt*2.7;
+
+    if(!s.got&&Math.hypot(s.x-player.x,s.y-player.y)<28){
+      s.got=true;
+      found++;
+      streak++;
+      score+=2;
+
+      audio.sample();
+      burst(s.x,s.y,'#55d9ff',18);
+
+      notify(
+        streak>1?`Research streak ×${streak}`:'Science sample secured',
+        'PAYLOAD CONFIRMED'
+      );
+
+      hud();
+    }else if(!s.got&&s.x<player.x-35){
+      streak=0;
+    }
+  }
+
+  samples=samples.filter(s=>s.x>-40&&!s.got);
+
+  if(player.y>H+25||player.y<-45){
+    loseLife();
+  }
+}
+
+function drawStation(p){
+  const top=p.cy-p.gap/2;
+  const bottom=p.cy+p.gap/2;
+  const gradient=ctx.createLinearGradient(p.x,0,p.x+p.w,0);
+
+  gradient.addColorStop(0,'#192743');
+  gradient.addColorStop(.5,'#577291');
+  gradient.addColorStop(1,'#132039');
+
+  ctx.fillStyle=gradient;
+  ctx.fillRect(p.x,0,p.w,top);
+  ctx.fillRect(p.x,bottom,p.w,H-bottom);
+
+  ctx.fillStyle='#55d9ff';
+  ctx.fillRect(p.x-5,top-9,p.w+10,9);
+  ctx.fillRect(p.x-5,bottom,p.w+10,9);
+
+  ctx.strokeStyle='#a7bad055';
+
+  for(let y=18;y<top-12;y+=30){
+    ctx.strokeRect(p.x+10,y,p.w-20,12);
+  }
+
+  for(let y=bottom+18;y<H;y+=30){
+    ctx.strokeRect(p.x+10,y,p.w-20,12);
+  }
+}
+
+function drawSample(s){
+  ctx.save();
+  ctx.translate(s.x,s.y+Math.sin(s.a)*4);
+  ctx.rotate(s.a*.25);
+  ctx.shadowBlur=18;
+  ctx.shadowColor='#55d9ff';
+  ctx.fillStyle='#dffaff';
+  ctx.fillRect(-8,-11,16,22);
+  ctx.fillStyle='#55d9ff';
+  ctx.fillRect(-11,-5,22,10);
+  ctx.restore();
+}
+
+function drawAstronaut(){
+  if(invulnerable>0&&Math.floor(invulnerable*10)%2===0)return;
+
+  const tilt=Math.max(-.45,Math.min(.6,player.vy/700));
+
+  ctx.save();
+  ctx.translate(player.x,player.y);
+  ctx.rotate(tilt);
+
+  if(player.flame||state==='playing'){
+    ctx.globalAlpha=.65+Math.random()*.35;
+
+    const gradient=ctx.createLinearGradient(-33,0,-10,0);
+    gradient.addColorStop(0,'#ff4c39');
+    gradient.addColorStop(.5,'#ffbf4c');
+    gradient.addColorStop(1,'#dffcff');
+
+    ctx.fillStyle=gradient;
+    ctx.beginPath();
+    ctx.moveTo(-12,-8);
+    ctx.lineTo(-27-Math.random()*12,0);
+    ctx.lineTo(-12,8);
+    ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  ctx.fillStyle='#7389a8';
+  ctx.fillRect(-14,-13,12,26);
+
+  ctx.fillStyle='#f4f7fc';
+  ctx.beginPath();
+  ctx.roundRect(-7,-13,24,26,8);
+  ctx.fill();
+
+  ctx.fillStyle='#152744';
+  ctx.beginPath();
+  ctx.arc(11,-8,9,0,TAU);
+  ctx.fill();
+
+  ctx.fillStyle='#55d9ff';
+  ctx.globalAlpha=.6;
+  ctx.beginPath();
+  ctx.arc(13,-9,5,0,TAU);
+  ctx.fill();
+  ctx.globalAlpha=1;
+
+  ctx.strokeStyle='#f4f7fc';
+  ctx.lineWidth=6;
+  ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.moveTo(1,7);
+  ctx.lineTo(-4,18);
+  ctx.moveTo(10,8);
+  ctx.lineTo(16,18);
+  ctx.moveTo(1,-3);
+  ctx.lineTo(-10,3);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function draw(){
+  const background=ctx.createLinearGradient(0,0,0,H);
+  background.addColorStop(0,'#020512');
+  background.addColorStop(.6,'#0a1530');
+  background.addColorStop(1,'#190d28');
+
+  ctx.fillStyle=background;
+  ctx.fillRect(0,0,W,H);
+
+  for(const s of stars){
+    ctx.globalAlpha=s.a;
+    ctx.fillStyle='#fff';
+    ctx.fillRect(s.x,s.y,s.s,s.s);
+  }
+
+  ctx.globalAlpha=1;
+
+  const planet=ctx.createRadialGradient(
+    W*.82,H*.76,8,
+    W*.82,H*.76,H*.3
+  );
+
+  planet.addColorStop(0,'#ef794c');
+  planet.addColorStop(.5,'#7d2e4f');
+  planet.addColorStop(1,'transparent');
+
+  ctx.globalAlpha=.22;
+  ctx.fillStyle=planet;
+  ctx.beginPath();
+  ctx.arc(W*.82,H*.76,H*.3,0,TAU);
+  ctx.fill();
+  ctx.globalAlpha=1;
+
+  stations.forEach(drawStation);
+  samples.forEach(drawSample);
+
+  if(state!=='menu'){
+    drawAstronaut();
+  }
+
+  for(const p of particles){
+    ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillStyle=p.color;
+    ctx.fillRect(p.x,p.y,3,3);
+  }
+
+  ctx.globalAlpha=1;
+}
+
+function loop(now){
+  const dt=Math.min(.033,(now-last)/1000||0);
+  last=now;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+addEventListener('pointerdown',event=>{
+  if(
+    !event.target.closest('button')&&
+    !event.target.closest('.panel')
+  ){
+    thrust();
+  }
+});
+
+addEventListener('keydown',event=>{
+  if(event.code==='Space'){
+    event.preventDefault();
+    thrust();
+  }
+
+  if(event.code==='Escape'){
+    if(state==='playing'){
+      state='paused';
+      screens('pause');
+    }else if(state==='paused'){
+      state='playing';
+      screens(null);
+    }
+  }
+});
+
+$('start').onclick=start;
+$('again').onclick=start;
+$('restartPause').onclick=start;
+$('howBtn').onclick=()=>screens('how');
+$('howBack').onclick=()=>screens('menu');
+
+$('pauseBtn').onclick=()=>{
+  state='paused';
+  screens('pause');
+};
+
+$('resume').onclick=()=>{
+  state='playing';
+  last=performance.now();
+  screens(null);
+};
+
+$('menuPause').onclick=()=>{
+  state='menu';
+  totals();
+  screens('menu');
+};
+
+$('menuOver').onclick=()=>{
+  state='menu';
+  totals();
+  screens('menu');
+};
+
+document.querySelectorAll('.sound').forEach(button=>{
+  button.onclick=()=>{
+    soundOn=!soundOn;
+    totals();
+  };
+});
+
+buildDiff();
+totals();
+reset();
+requestAnimationFrame(loop);
 })();
 </script>
 </body>
